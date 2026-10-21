@@ -106,6 +106,7 @@ class _HomePageState extends State<HomePage> {
                   itemCount: noticias.length,
                   itemBuilder: (context, index) {
                     final noticia = noticias[index];
+
                     return Card(
                       margin: const EdgeInsets.only(bottom: 12),
                       color: Colors.white,
@@ -123,7 +124,14 @@ class _HomePageState extends State<HomePage> {
                             width: double.infinity,
                             height: 120,
                             color: const Color(0xFFE4E9EF),
-                            child: const Icon(Icons.image_outlined),
+                            child: noticia.imagem != null
+                                ? Image.network(
+                                    noticia.imagem!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, erro, stack) =>
+                                        const Icon(Icons.image_outlined),
+                                  )
+                                : const Icon(Icons.image_outlined),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(12),
@@ -141,7 +149,7 @@ class _HomePageState extends State<HomePage> {
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Text(
-                                        'Categoria: ${noticia.categoriaId}',
+                                        noticia.categoriaNome,
                                         style: const TextStyle(fontSize: 11),
                                       ),
                                     ),

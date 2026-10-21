@@ -5,6 +5,7 @@ class Noticia {
   final String conteudo;
   final String? imagem;
   final int categoriaId;
+  final String categoriaNome;
   final DateTime createdAt;
 
   Noticia({
@@ -14,6 +15,7 @@ class Noticia {
     required this.conteudo,
     this.imagem,
     required this.categoriaId,
+    required this.categoriaNome,
     required this.createdAt,
   });
 
@@ -23,7 +25,9 @@ class Noticia {
       titulo: json['titulo'],
       resumo: json['resumo'],
       conteudo: json['conteudo'],
+      imagem: json['imagem'],
       categoriaId: json['categoria_id'],
+      categoriaNome: json['categoria_nome'],
       createdAt: DateTime.parse(json['created_at']),
     );
   }
