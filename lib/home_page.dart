@@ -1,5 +1,7 @@
+import 'package:app_noticias_tii/detalhe_noticia_page.dart';
 import 'package:app_noticias_tii/models/noticia.dart';
 import 'package:app_noticias_tii/services/noticia_service.dart';
+import 'package:app_noticias_tii/sobre_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -43,7 +45,40 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      drawer: const Drawer(),
+
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+              ),
+              child: Image.asset('assets/img/logotipo.png'),
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Início'),
+              onTap: () => Navigator.pop(context),
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('Sobre'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SobrePage()),
+                );
+              },
+            ),
+
+            //Sobre
+          ],
+        ),
+      ),
+
       body: Column(
         children: [
           SizedBox(
@@ -107,88 +142,100 @@ class _HomePageState extends State<HomePage> {
                   itemBuilder: (context, index) {
                     final noticia = noticias[index];
 
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      color: Colors.white,
-                      elevation: 0,
-                      clipBehavior: Clip.antiAlias,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        side: const BorderSide(
-                          color: Color(0xFFCBD2D9),
+                    return InkWell(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              DetalheNoticiaPage(noticia: noticia),
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            height: 120,
-                            color: const Color(0xFFE4E9EF),
-                            child: noticia.imagem != null
-                                ? Image.network(
-                                    noticia.imagem!,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, erro, stack) =>
-                                        const Icon(Icons.image_outlined),
-                                  )
-                                : const Icon(Icons.image_outlined),
+
+                      child: Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        color: Colors.white,
+                        elevation: 0,
+                        clipBehavior: Clip.antiAlias,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: const BorderSide(
+                            color: Color(0xFFCBD2D9),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0,
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: 120,
+                              color: const Color(0xFFE4E9EF),
+                              child: noticia.imagem != null
+                                  ? Image.network(
+                                      noticia.imagem!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, erro, stack) =>
+                                          const Icon(Icons.image_outlined),
+                                    )
+                                  : const Icon(Icons.image_outlined),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFEFF4F8),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          noticia.categoriaNome,
+                                          style: const TextStyle(fontSize: 11),
+                                        ),
                                       ),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFEFF4F8),
-                                        borderRadius: BorderRadius.circular(10),
+
+                                      const SizedBox(
+                                        width: 15,
                                       ),
-                                      child: Text(
-                                        noticia.categoriaNome,
+                                      Text(
+                                        noticia.dataFormatada,
                                         style: const TextStyle(fontSize: 11),
                                       ),
-                                    ),
-
-                                    const SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text(
-                                      noticia.dataFormatada,
-                                      style: const TextStyle(fontSize: 11),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 8,
-                                ),
-                                Text(
-                                  noticia.titulo,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    color: Color(0xFF1b2a4a),
-                                    fontWeight: FontWeight.bold,
+                                    ],
                                   ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  noticia.resumo,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: Color(0xFF5B6B79),
+                                  const SizedBox(
+                                    height: 8,
                                   ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
+                                  Text(
+                                    noticia.titulo,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      color: Color(0xFF1b2a4a),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    noticia.resumo,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Color(0xFF5B6B79),
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   },

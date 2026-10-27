@@ -1,4 +1,4 @@
-import 'package:app_noticias_tii/models/noticia.dart';
+import 'models/noticia.dart';
 import 'package:flutter/material.dart';
 
 class DetalheNoticiaPage extends StatelessWidget {
