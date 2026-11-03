@@ -19,7 +19,10 @@ class _HomePageState extends State<HomePage> {
 
   final CategoriaService _categoriaService = CategoriaService();
   List<Categoria> _listaCategorias = [];
-  final String _categoriaSelecionada = 'Todas';
+  String _categoriaSelecionada = 'Todas';
+
+  String _textoPesquisa = '';
+  bool _buscando = false;
 
   @override
   void initState() {
@@ -39,19 +42,60 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  List<Noticia> aplicarFiltro(List<Noticia> noticias) {
+    if (_textoPesquisa.isNotEmpty) {
+      return noticias.where((noticia) {
+        return noticia.titulo.toLowerCase().contains(
+              _textoPesquisa.toLowerCase(),
+            ) ||
+            noticia.resumo.toLowerCase().contains(_textoPesquisa.toLowerCase());
+      }).toList();
+    }
+
+    if (_categoriaSelecionada != 'Todas') {
+      return noticias.where((noticia) {
+        return noticia.categoriaNome == _categoriaSelecionada;
+      }).toList();
+    }
+
+    return noticias;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Image.asset(
-          'assets/img/logotipo.png',
-          height: 20,
-        ),
+        title: _buscando
+            ? TextField(
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Pesquisar...',
+                ),
+                onChanged: (valor) {
+                  setState(() {
+                    _textoPesquisa = valor;
+                  });
+                },
+              )
+            : Image.asset(
+                'assets/img/logotipo.png',
+                height: 20,
+              ),
         centerTitle: true,
         actions: [
-          const Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: Icon(Icons.search),
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: IconButton(
+              onPressed: () {
+                setState(() {
+                  _buscando = !_buscando;
+                  if (!_buscando) {
+                    _textoPesquisa = "";
+                  }
+                });
+              },
+              icon: Icon(_buscando ? Icons.close : Icons.search),
+            ),
           ),
         ],
       ),
@@ -104,25 +148,32 @@ class _HomePageState extends State<HomePage> {
 
                 final selecionada = _categoriaSelecionada == categoria;
 
-                return Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: selecionada
-                          ? Colors.black
-                          : const Color(0xFFEDEDED),
+                return InkWell(
+                  onTap: () {
+                    setState(() {
+                      _categoriaSelecionada = categoria;
+                    });
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
                     ),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    categoria,
-                    style: const TextStyle(fontSize: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: selecionada
+                            ? Colors.black
+                            : const Color(0xFFEDEDED),
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      categoria,
+                      style: const TextStyle(fontSize: 12),
+                    ),
                   ),
                 );
               },
@@ -144,7 +195,9 @@ class _HomePageState extends State<HomePage> {
                   );
                 }
 
-                final noticias = asyncSnapshot.data ?? [];
+                final todasNoticias = asyncSnapshot.data ?? [];
+
+                final noticias = aplicarFiltro(todasNoticias);
 
                 if (noticias.isEmpty) {
                   return const Center(
