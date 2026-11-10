@@ -1,4 +1,5 @@
 import 'package:app_noticias_tii/detalhe_noticia_page.dart';
+import 'package:app_noticias_tii/login_page.dart';
 import 'package:app_noticias_tii/models/categoria.dart';
 import 'package:app_noticias_tii/models/noticia.dart';
 import 'package:app_noticias_tii/services/categoria_service.dart';
@@ -128,7 +129,19 @@ class _HomePageState extends State<HomePage> {
               },
             ),
 
-            //Sobre
+            const Divider(),
+
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('Entrar'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+              },
+            ),
           ],
         ),
       ),
