@@ -3,6 +3,7 @@ import 'package:app_noticias_tii/login_page.dart';
 import 'package:app_noticias_tii/models/categoria.dart';
 import 'package:app_noticias_tii/models/noticia.dart';
 import 'package:app_noticias_tii/services/categoria_service.dart';
+import 'package:app_noticias_tii/services/login_services.dart';
 import 'package:app_noticias_tii/services/noticia_service.dart';
 import 'package:app_noticias_tii/sobre_page.dart';
 import 'package:flutter/material.dart';
@@ -19,17 +20,32 @@ class _HomePageState extends State<HomePage> {
   late Future<List<Noticia>> _listaNoticias;
 
   final CategoriaService _categoriaService = CategoriaService();
+
+  final LoginServices _loginServices = LoginServices();
+
   List<Categoria> _listaCategorias = [];
   String _categoriaSelecionada = 'Todas';
 
   String _textoPesquisa = '';
   bool _buscando = false;
 
+  bool _logado = false;
+
   @override
   void initState() {
     super.initState();
     _listaNoticias = _noticiaService.getNoticias();
     carregarCategorias();
+    _checarSessao();
+  }
+
+  Future<void> _checarSessao() async {
+    final token = await _loginServices.getToken();
+    if (mounted) {
+      setState(() {
+        _logado = token != null;
+      });
+    }
   }
 
   Future<void> carregarCategorias() async {
@@ -130,18 +146,37 @@ class _HomePageState extends State<HomePage> {
             ),
 
             const Divider(),
-
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('Entrar'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              },
-            ),
+            if (_logado)
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('Sair'),
+                onTap: () async {
+                  await _loginServices.logout();
+                  if (mounted) {
+                    Navigator.pop(context);
+                    setState(() {
+                      _logado = false;
+                    });
+                  }
+                },
+              )
+            else
+              ListTile(
+                leading: const Icon(Icons.login),
+                title: const Text('Entrar'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final entrou = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                  );
+                  if (entrou == true) {
+                    setState(() {
+                      _logado = true;
+                    });
+                  }
+                },
+              ),
           ],
         ),
       ),

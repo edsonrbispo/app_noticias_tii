@@ -13,8 +13,42 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   final LoginServices _loginService = LoginServices();
 
-  final bool _carregando = false;
+  bool _carregando = false;
   String? _mensagemErro;
+
+  Future<void> autenticar() async {
+    setState(() {
+      _carregando = true;
+      _mensagemErro = null;
+    });
+
+    try {
+      final nome = await _loginService.login(
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Olá $nome, você esta logado com sucesso!'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+
+      Navigator.pop(context, true);
+    } catch (e) {
+      setState(() {
+        _mensagemErro = e.toString().replaceFirst('Exception', '');
+      });
+    } finally {
+      setState(() {
+        _carregando = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,9 +91,28 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(
                 height: 20,
               ),
+
+              if (_mensagemErro != null) ...[
+                Text(
+                  _mensagemErro!,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ],
+
+              const SizedBox(
+                height: 20,
+              ),
               ElevatedButton(
-                onPressed: () {},
-                child: const Text('Entrar'),
+                onPressed: _carregando ? null : autenticar,
+                child: _carregando
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text('Entrar'),
               ),
             ],
           ),
